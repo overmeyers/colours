@@ -24,7 +24,7 @@ static const char *colorname[] = {
 
 	/* more colors can be added after 255 to use with DefaultXX */
 	[256] = "#585A6E", /* default reverse cursor colour */
-	[257] = "black", /* default background colour */
+	[257] = "#1B1616", /* default background colour */
 };
 
 
