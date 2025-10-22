@@ -1,0 +1,48 @@
+name: Update README Swatches
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'colours.json'
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Run swatch generator
+        run: go run .github/generate-swatches.go
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet README.md assets/swatches/; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md assets/swatches/
+          git commit -m "Update README colour swatches from colours.json"
+          git push
+
+permissions:
+  contents: write
